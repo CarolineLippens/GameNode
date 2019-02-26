@@ -21,8 +21,8 @@ const game = new Phaser.Game(config);
  
 function preload() {
   	
-  this.load.image('ship', 'assets/attack1.png');
-  this.load.image('otherPlayer', 'assets/attack2.png');
+  this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
+  this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
   
 }
 
@@ -51,9 +51,22 @@ function update() {
     }else if (this.cursors.up.isDown){
       this.ship.setVelocityY(-80);
     }
+  // emit player movement
+    var x = this.ship.x;
+    var y = this.ship.y;
+    var r = this.ship.rotation;
+    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
+      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
+    }
+    
+    // save old position data
+    this.ship.oldPosition = {
+      x: this.ship.x,
+      y: this.ship.y,
+      rotation: this.ship.rotation
+};
   
-  
-    // this.physics.world.wrap(this.ship, 5);
+    
   }
 }
 function create() {
@@ -72,13 +85,24 @@ function create() {
       }
     });
   });
+// ajout d 'un autre player
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
   });
+
   this.socket.on('disconnect', function (playerId) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
+      }
+    });
+  });
+  //Controle le mouvement de l'autre joueur
+  this.socket.on('playerMoved', function (playerInfo) {
+    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+      if (playerInfo.playerId === otherPlayer.playerId) {
+        otherPlayer.setRotation(playerInfo.rotation);
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
       }
     });
   });
