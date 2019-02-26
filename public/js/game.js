@@ -23,7 +23,7 @@ function preload() {
   	
   this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
   this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
-  
+  this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
 }
 
 function addPlayer(self, playerInfo) {
@@ -85,6 +85,7 @@ function create() {
       }
     });
   });
+
 // ajout d 'un autre player
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
@@ -101,11 +102,27 @@ function create() {
   this.socket.on('playerMoved', function (playerInfo) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
-        otherPlayer.setRotation(playerInfo.rotation);
+        // otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
       }
     });
   });
+  // Affichage de score
+    this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
+  this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
+    
+  this.socket.on('scoreUpdate', function (scores) {
+    self.blueScoreText.setText('Blue: ' + scores.blue);
+    self.redScoreText.setText('Red: ' + scores.red);
+    // Affichage des étoiles
+  });
+      this.socket.on('starLocation', function (starLocation) {
+        if (self.star) self.star.destroy();
+        self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
+        self.physics.add.overlap(self.ship, self.star, function () {
+          this.socket.emit('starCollected');
+        }, null, self);
+      });
 }
 
 function addOtherPlayers(self, playerInfo) {
