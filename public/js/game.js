@@ -44,6 +44,7 @@ function update() {
   if (this.ship) {
     if (this.cursors.left.isDown) {
       this.ship.setVelocityX(-80);
+      
     } else if (this.cursors.right.isDown) {
       this.ship.setVelocityX(80);
     } else if (this.cursors.down.isDown){
@@ -51,6 +52,7 @@ function update() {
     }else if (this.cursors.up.isDown){
       this.ship.setVelocityY(-80);
     }
+
   // emit player movement
     var x = this.ship.x;
     var y = this.ship.y;
@@ -108,7 +110,7 @@ function create() {
     });
   });
   // Affichage de score
-    this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
+  this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
     
   this.socket.on('scoreUpdate', function (scores) {
@@ -116,13 +118,13 @@ function create() {
     self.redScoreText.setText('Red: ' + scores.red);
     // Affichage des étoiles
   });
-      this.socket.on('starLocation', function (starLocation) {
-        if (self.star) self.star.destroy();
-        self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
-        self.physics.add.overlap(self.ship, self.star, function () {
-          this.socket.emit('starCollected');
-        }, null, self);
-      });
+  this.socket.on('starLocation', function (starLocation) {
+    if (self.star) self.star.destroy();
+    self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
+    self.physics.add.overlap(self.ship, self.star, function () {
+      this.socket.emit('starCollected');
+    }, null, self);
+  });
 }
 
 function addOtherPlayers(self, playerInfo) {

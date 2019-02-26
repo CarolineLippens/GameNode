@@ -8,8 +8,8 @@ var star = {
   y: Math.floor(Math.random() * 500) + 50
 };
 var scores = {
-  blue: 0,
-  red: 0
+  blue: 100,
+  red: 100
 };
 
 app.use(express.static(__dirname + '/public'));
@@ -58,9 +58,9 @@ socket.on('playerMovement', function (movementData) {
 // Collete d'etoile
 socket.on('starCollected', function () {
   if (players[socket.id].team === 'red') {
-    scores.red += 10;
+    scores.red -= 10;
   } else {
-    scores.blue += 10;
+    scores.blue -= 10;
   }
   star.x = Math.floor(Math.random() * 700) + 50;
   star.y = Math.floor(Math.random() * 500) + 50;
