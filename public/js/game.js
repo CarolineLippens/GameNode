@@ -26,9 +26,9 @@ function preload() {
   // this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
   this.load.spritesheet('dude','assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
   this.load.spritesheet('dudeAttack','assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
-  this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
   this.load.spritesheet('SdudeAttack','assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
-  // this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
+  this.load.spritesheet('otherPlayer', 'assets/nainrun.png', { frameWidth: 108, frameHeight: 80 });
+  this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
   
 }
 
@@ -43,12 +43,16 @@ function addPlayer(self, playerInfo) {
   player.setDrag(100);
   player.setAngularDrag(100);
   player.setMaxVelocity(70);
+  // otherPlayer.setDrag(100);
+  // otherPlayer.setAngularDrag(100);
+  // otherPlayer.setMaxVelocity(70);
 }
 
 
 
 function update() {  
-  
+
+
   if (player) {
     if (this.cursors.left.isDown) {
       direction = "left";
@@ -91,7 +95,7 @@ function update() {
       direction = "right";
       player.anims.play('SattackRight', true);
     }
-
+    
   // emit player movement
     var x = player.x;
     var y = player.y;
@@ -105,17 +109,35 @@ function update() {
       x: player.x,
       y: player.y,
       rotation: player.rotation
-};
-    
+    };
+    // otherPlayer.oldPosition = {
+    //   x: player.x,
+    //   y: player.y,
+    //   rotation: player.rotation
+    // };  
   }
 }
 
 function create() {
 
   player = this.physics.add.sprite(100, 350, 'dude');
-  // player.setBounce(0.2);
   player.setCollideWorldBounds(true);
   
+  // otherPlayer = this.physics.add.sprite(100, 350, 'otherPlayer');
+  // otherPlayer.setCollideWorldBounds(true);
+  this.anims.create({
+    key: 'leftOther',
+    frames: this.anims.generateFrameNumbers('otherPlayer', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+});
+
+this.anims.create({
+    key: 'rightOther',
+    frames: this.anims.generateFrameNumbers('otherPlayer', { start: 3, end: 5 }),
+    frameRate: 10,
+    repeat: 1
+});
   this.anims.create({
       key: 'left',
       frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
@@ -156,42 +178,24 @@ function create() {
 
   this.cursors = this.input.keyboard.createCursorKeys();
   var self = this;
-
   this.socket = io();
-  this.otherPlayers = this.physics.add.group();
-
+  this.otherPlayers = this.physics.add.group(); 
+  
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         addPlayer(self, players[id]);
       } else {
-        addOtherPlayers(self, players[id]);
+        // addOtherPlayers(self, players[id]);
       }
     });
   });
 
 // ajout d 'un autre player
-  this.socket.on('newPlayer', function (playerInfo) {
-    addOtherPlayers(self, playerInfo);
-  });
+  // this.socket.on('newPlayer', function (playerInfo) {
+  //   addOtherPlayers(self, playerInfo);
+  // });
 
-  this.socket.on('disconnect', function (playerId) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-      if (playerId === otherPlayer.playerId) {
-        otherPlayer.destroy();
-      }
-    });
-  });
-  
-  //Controle le mouvement de l'autre joueur
-  this.socket.on('playerMoved', function (playerInfo) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        // otherPlayer.setRotation(playerInfo.rotation);
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
-  });
   // Affichage de score
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
@@ -201,22 +205,15 @@ function create() {
     self.redScoreText.setText('Red: ' + scores.red);
     // Affichage des étoiles
   });
-  this.socket.on('starLocation', function (starLocation) {
-    // if (self.star) self.star.destroy();
-    // self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
-    // self.physics.add.overlap(self.ship, self.star, function () {
-    //   this.socket.emit('starCollected');
-    // }, null, self);
-  });
 }
 
-function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-  // if (playerInfo.team === 'blue') {
-  //   otherPlayer.setTint(0x0000ff);
-  // } else {
-  //   otherPlayer.setTint(0xff0000);
-  // }
-  otherPlayer.playerId = playerInfo.playerId;
-  self.otherPlayers.add(otherPlayer);
-}
+// function addOtherPlayers(self, playerInfo) {
+//   // const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+//   // if (playerInfo.team === 'blue') {
+//   //   otherPlayer.setTint(0x0000ff);
+//   // } else {
+//   //   otherPlayer.setTint(0xff0000);
+//   // }
+//   // otherPlayer.playerId = playerInfo.playerId;
+//   // self.otherPlayers.add(otherPlayer);
+// }

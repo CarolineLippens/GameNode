@@ -32,19 +32,19 @@ io.on('connection', function (socket) {
 socket.emit('currentPlayers', players);
 
 // send the star object to the new player
-socket.emit('starLocation', star);
+// socket.emit('starLocation', star);
 // send the current scores
 socket.emit('scoreUpdate', scores);
 
 // update all other players of the new player
-socket.broadcast.emit('newPlayer', players[socket.id]);
-    socket.on('disconnect', function () {
-      console.log('user disconnected');
-        // remove this player from our players object
-        delete players[socket.id];
-        // emit a message to all players to remove this player
-        io.emit('disconnect', socket.id);
-    });
+// socket.broadcast.emit('newPlayer', players[socket.id]);
+//     socket.on('disconnect', function () {
+//       console.log('user disconnected');
+//         // remove this player from our players object
+//         delete players[socket.id];
+//         // emit a message to all players to remove this player
+//         io.emit('disconnect', socket.id);
+//     });
 
 // when a player moves, update the player data
 socket.on('playerMovement', function (movementData) {
