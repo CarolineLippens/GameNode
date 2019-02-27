@@ -20,15 +20,26 @@ const config = {
 
 const game = new Phaser.Game(config);
 let marche, direction;
+let random = parseInt(Math.random() * 10);
 
 function preload() {
   	
-  // this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
+// BLUE 
   this.load.spritesheet('dude','assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
   this.load.spritesheet('dudeAttack','assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
-  this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
   this.load.spritesheet('SdudeAttack','assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
-  // this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
+
+// MINAUTORE
+  this.load.spritesheet('minautore', 'assets/minaurun.png', {frameWidth: 110, frameHeight: 80});
+  this.load.spritesheet('minauAttack','assets/minauattack.png', { frameWidth: 108, frameHeight: 80 });
+
+// NAIN
+  this.load.spritesheet('nain', 'assets/nainrun.png', {frameWidth: 140, frameHeight: 80});
+
+
+  // OTHER PLAYER
+ // this.load.spritesheet('otherPlayer', 'assets/minaurun.png', {frameWidth: 80, frameHeight: 80});
+
   
 }
 
@@ -112,10 +123,26 @@ function update() {
 
 function create() {
 
-  player = this.physics.add.sprite(100, 350, 'dude');
+  // CREE BLUE
+  if (random < 3) {
+    player = this.physics.add.sprite(100, 350, 'dude');
+  }
+  // CREE UN MINAUTORE
+  else if(random >= 3 && random <= 5 ) {
+    player = this.physics.add.sprite(100, 350, 'minautore');
+  }
+ // CREE UN NAIN
+  else if(random > 5 && random < 8 ) {
+    player = this.physics.add.sprite(100, 350, 'nain');
+  }
+
+  else {
+    player = this.physics.add.sprite(100, 350, 'nain');
+  }
   // player.setBounce(0.2);
   player.setCollideWorldBounds(true);
-  
+ //ANIMATIONS BLUE
+  if (random < 3) {
   this.anims.create({
       key: 'left',
       frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
@@ -153,6 +180,90 @@ function create() {
   frameRate: 10,
   repeat: 1
   });
+} 
+//ANIMATIONS MINAUTORE
+else if (random >= 3 && random <= 5) {
+  this.anims.create({
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('minautore', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+});
+
+this.anims.create({
+    key: 'right',
+    frames: this.anims.generateFrameNumbers('minautore', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
+});
+this.anims.create({
+  key: 'attackLeft',
+  frames: this.anims.generateFrameNumbers('minauAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+  key: 'attackRight',
+  frames: this.anims.generateFrameNumbers('minauAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+});
+/*
+this.anims.create({
+  key: 'SattackRight',
+  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+key: 'SattackLeft',
+frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+frameRate: 10,
+repeat: 1
+});*/
+}
+//ANIMATIONS NAINS
+else if (random > 5 && random <= 10) {
+  this.anims.create({
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+});
+
+this.anims.create({
+    key: 'right',
+    frames: this.anims.generateFrameNumbers('nain', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
+});
+/*this.anims.create({
+  key: 'attackLeft',
+  frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+  key: 'attackRight',
+  frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+  key: 'SattackRight',
+  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+key: 'SattackLeft',
+frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+frameRate: 10,
+repeat: 1
+});*/
+}
+
+
 
   this.cursors = this.input.keyboard.createCursorKeys();
   var self = this;
@@ -211,7 +322,7 @@ function create() {
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5);
   // if (playerInfo.team === 'blue') {
   //   otherPlayer.setTint(0x0000ff);
   // } else {
