@@ -106,7 +106,6 @@ function update() {
       y: player.y,
       rotation: player.rotation
 };
-  
     
   }
 }
