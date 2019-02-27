@@ -83,9 +83,12 @@ function create() {
     frameRate: 10,
     repeat: 1
   });
+
   var self = this;
   this.socket = io();
+
   this.otherPlayers = this.physics.add.group();
+
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
@@ -95,22 +98,24 @@ function create() {
       }
     });
   });
+
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
   });
+
   this.socket.on('disconnect', function (playerId) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
       }
     });
-    this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
-    this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
+  this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
+  this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
     
-    this.socket.on('scoreUpdate', function (scores) {
-      self.blueScoreText.setText('Blue: ' + scores.blue);
-      self.redScoreText.setText('Red: ' + scores.red);
-    });
+  this.socket.on('scoreUpdate', function (scores) {
+    self.blueScoreText.setText('Blue: ' + scores.blue);
+    self.redScoreText.setText('Red: ' + scores.red);
+  });
   });
 
 
