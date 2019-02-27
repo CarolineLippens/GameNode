@@ -16,14 +16,20 @@ const config = {
       update: update
     } 
   };
-   
+  var bullets;
+  var ship;
+  var speed;
+  var stats;
+  var cursors;
+  var lastFired = 0;
 const game = new Phaser.Game(config);
 
 function preload() {
   	
   this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
   this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
-  this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
+  this.load.image('star', 'assets/nain_champ/attack/attack4.png');
+  this.load.image('bullet', 'assets/lazer.png'); 
 }
 
 function addPlayer(self, playerInfo) {
@@ -40,17 +46,32 @@ function addPlayer(self, playerInfo) {
 
 
 
-function update() {  
+function update(time) {  
   if (this.ship) {
     if (this.cursors.left.isDown) {
-      this.ship.setVelocityX(-80);
+      this.ship.setVelocityX(-200);
     } else if (this.cursors.right.isDown) {
-      this.ship.setVelocityX(80);
+      this.ship.setVelocityX(200);
     } else if (this.cursors.down.isDown){
-      this.ship.setVelocityY(80);
+      this.ship.setVelocityY(200);
     }else if (this.cursors.up.isDown){
-      this.ship.setVelocityY(-80);
+      this.ship.setVelocityY(-200);
     }
+  if (this.cursors.space.isDown && time > lastFired)
+  {
+      var bullet = bullets.get();
+
+      if (bullet)
+      {
+          bullet.fire(this.ship.x, this.ship.y);
+
+          lastFired = time + 50;
+      }
+  }
+
+
+
+
   // emit player movement
     var x = this.ship.x;
     var y = this.ship.y;
@@ -65,12 +86,58 @@ function update() {
       y: this.ship.y,
       rotation: this.ship.rotation
 };
-  
-    
+
   }
 
 }
 function create() {
+
+  var Bullet = new Phaser.Class({
+
+    Extends: Phaser.GameObjects.Image,
+
+    initialize:
+
+    function Bullet (scene)
+    {
+        Phaser.GameObjects.Image.call(this, scene, 0, 0, 'bullet');
+
+        this.speed = Phaser.Math.GetSpeed(400, 1);
+    },
+
+    fire: function (x, y)
+    {
+        this.setPosition(x, y - 10);
+
+        this.setActive(true);
+        this.setVisible(true);
+    },
+
+    update: function (time, delta)
+    {
+        this.y -= this.speed * delta;
+
+        if (this.y < -50)
+        {
+            this.setActive(false);
+            this.setVisible(false);
+        }
+    }
+
+});
+
+bullets = this.add.group({
+    classType: Bullet,
+    maxSize: 10,
+    runChildUpdate: true
+});
+
+
+
+cursors = this.input.keyboard.createCursorKeys();
+
+speed = Phaser.Math.GetSpeed(300, 1);
+
 
   this.cursors = this.input.keyboard.createCursorKeys();
   var self = this;
@@ -108,19 +175,25 @@ function create() {
       }
     });
   });
+
   // Affichage de score
-  this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
-  this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
-    
-  this.socket.on('scoreUpdate', function (scores) {
-    self.blueScoreText.setText('Blue: ' + scores.blue);
-    self.redScoreText.setText('Red: ' + scores.red);
+  let colorScore ='yellow';
+  // this.socket.on('colorScore', function (lifePoint) {
+  //     if(lifePoint.red<30) {colorScore='red'} else {colorScore='blue'}
+  // });
+
+  this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: colorScore });
+  this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: colorScore });
+  
+  this.socket.on('scoreUpdate', function (lifePoint) {
+    self.blueScoreText.setText('Blue: ' + lifePoint.blue);
+    self.redScoreText.setText('Red: ' + lifePoint.red);
     // Affichage des étoiles
   });
       this.socket.on('starLocation', function (starLocation) {
-        if (self.star) self.star.destroy();
+        if (self.star) self.star.collider();
         self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
-        self.physics.add.overlap(self.ship, self.star, function () {
+        self.physics.add.collider(this.bullets, self.star, function () {
           this.socket.emit('starCollected');
         }, null, self);
       });

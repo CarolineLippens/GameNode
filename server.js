@@ -7,10 +7,11 @@ var star = {
   x: Math.floor(Math.random() * 700) + 50,
   y: Math.floor(Math.random() * 500) + 50
 };
-var scores = {
-  blue: 20,
-  red: 20
+var lifePoint = {
+  blue: 100,
+  red: 100
 };
+
 
 app.use(express.static(__dirname + '/public'));
  
@@ -33,8 +34,8 @@ socket.emit('currentPlayers', players);
 
 // send the star object to the new player
 socket.emit('starLocation', star);
-// send the current scores
-socket.emit('scoreUpdate', scores);
+// send the current lifePoint
+socket.emit('scoreUpdate', lifePoint);
 
 // update all other players of the new player
 socket.broadcast.emit('newPlayer', players[socket.id]);
@@ -58,15 +59,23 @@ socket.on('playerMovement', function (movementData) {
 // Collete d'etoile
 socket.on('starCollected', function () {
   if (players[socket.id].team === 'red') {
-    scores.red += (10*-1);
+    lifePoint.red += (10*-1);
   } 
+  if (lifePoint.red === 0 ) {
+    lifePoint.blue = 100
+    lifePoint.red = 100
+  }
   if (players[socket.id].team === 'blue') {
-    scores.blue += (10*-1)
+    lifePoint.blue += (10*-1)
+  }
+  if (lifePoint.blue === 0) {
+      lifePoint.blue = 100
+      lifePoint.red = 100
   }
   star.x = Math.floor(Math.random() * 700) + 50;
   star.y = Math.floor(Math.random() * 500) + 50;
   io.emit('starLocation', star);
-  io.emit('scoreUpdate', scores);
+  io.emit('scoreUpdate', lifePoint);
 });
   });
 
