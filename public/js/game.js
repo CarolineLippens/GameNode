@@ -33,7 +33,7 @@ function preload() {
 }
 
 function addPlayer(self, playerInfo) {
-  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y);
+  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y,'ship').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
     //  'ship').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
   // if (playerInfo.team === '') {
   //   self.ship.setTint(0x0000ff);
@@ -186,15 +186,15 @@ this.anims.create({
       if (players[id].playerId === self.socket.id) {
         addPlayer(self, players[id]);
       } else {
-        // addOtherPlayers(self, players[id]);
+        addOtherPlayers(self, players[id]);
       }
     });
   });
 
 // ajout d 'un autre player
-  // this.socket.on('newPlayer', function (playerInfo) {
-  //   addOtherPlayers(self, playerInfo);
-  // });
+  this.socket.on('newPlayer', function (playerInfo) {
+    addOtherPlayers(self, playerInfo);
+  });
 
   // Affichage de score
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
@@ -207,13 +207,13 @@ this.anims.create({
   });
 }
 
-// function addOtherPlayers(self, playerInfo) {
-//   // const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
-//   // if (playerInfo.team === 'blue') {
-//   //   otherPlayer.setTint(0x0000ff);
-//   // } else {
-//   //   otherPlayer.setTint(0xff0000);
-//   // }
-//   // otherPlayer.playerId = playerInfo.playerId;
-//   // self.otherPlayers.add(otherPlayer);
-// }
+function addOtherPlayers(self, playerInfo) {
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+  // if (playerInfo.team === 'blue') {
+  //   otherPlayer.setTint(0x0000ff);
+  // } else {
+  //   otherPlayer.setTint(0xff0000);
+  // }
+  otherPlayer.playerId = playerInfo.playerId;
+  self.otherPlayers.add(otherPlayer);
+}
