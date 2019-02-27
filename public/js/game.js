@@ -6,7 +6,7 @@ const config = {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false,
+        debug: true,
         gravity: { y: 0 }
       }
     },
@@ -20,11 +20,16 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-  	
-  this.load.image('ship', 'assets/attack1.png');
-  this.load.image('otherPlayer', 'assets/attack2.png');
+
+ /* this.load.image("Map", "assets/tilesets/Map.jpg");
+  this.load.image("tiles", "assets/tilesets/server_objects.png");
+  this.load.image("tile1", "assets/tilesets/tile1.png");
+  this.load.image("walkable", "assets/tilesets/walkable.png");
+  this.load.tilemapTiledJSON("map", "assets/tilemaps/MAPUF.json");*/
   this.load.image('fond','assets/Background.png');
   this.load.image('wall','assets/border.png');
+  this.load.image('ship', 'assets/attack1.png');
+  this.load.image('otherPlayer', 'assets/attack2.png');
 }
 
 function addPlayer(self, playerInfo) {
@@ -59,16 +64,29 @@ function update() {
 }
 var platforms;
 function create() {
+  
+ /* const map = this.make.tilemap({ key: "map" });
+  // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+  // Phaser's cache (i.e. the name you used in preload)
+  const tileset1 = map.addTilesetImage("Map caro", "Map");
+  const tileset2 = map.addTilesetImage("tile1","tile1");
 
+
+  // Parameters: layer name (or index) from Tiled, tileset, x, y
+  const worldLayer = map.createStaticLayer("Border", tileset1, 0, 0).setScale(0.5);
+  const belowLayer = map.createStaticLayer("Backgrounds", tileset1, 0, 0).setScale(0.5);
+  const aboveLayer = map.createStaticLayer("Colliders", tileset2, 0, 0);*/
   // Debut de la map
   
   this.add.image(750,450,'fond');
 
   platforms = this.physics.add.staticGroup();
 
-  platforms.create(750, 450, 'wall').refreshBody();
+  platforms.create(750, 450, 'wall');
+  this.physics.add.collider(ship, platforms);
   //Fin de la map
-
+  this.ship.depth = 1;
+  this.ship.setDepth(1);
   this.cursors = this.input.keyboard.createCursorKeys();
   var self = this;
   this.socket = io();
