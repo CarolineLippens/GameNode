@@ -19,14 +19,15 @@ const config = {
   
 
 const game = new Phaser.Game(config);
-let marche;
+let marche, direction;
 
 function preload() {
   	
   // this.load.image('ship', 'assets/nain_champ/attack/attack1.png');
   this.load.spritesheet('dude','assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
-  this.load.spritesheet('dudeAttack','assets/bluerunAttack.png', { frameWidth: 107, frameHeight: 80 });
+  this.load.spritesheet('dudeAttack','assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
   this.load.image('otherPlayer', 'assets/minau_champ/attack/attack2.png');
+  this.load.spritesheet('SdudeAttack','assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
   // this.load.image('star', 'assets/nain_champ/attack/attack4.png');  
   
 }
@@ -50,24 +51,45 @@ function update() {
   
   if (player) {
     if (this.cursors.left.isDown) {
-      
+      direction = "left";
       player.setVelocityX(-100);
       player.anims.play('left', true);
 
     } else if (this.cursors.right.isDown) {
-      
+      direction = "right";
       player.setVelocityX(100);
       player.anims.play('right', true);
 
-    } else if (this.cursors.down.isDown){
+    } else if (direction == "right" && this.cursors.down.isDown){
+      direction = "right";
       player.setVelocityY(100);
       player.anims.play('right', true);
-    }else if (this.cursors.up.isDown){
+    }else if (direction == "right" && this.cursors.up.isDown){
+      direction = "right";
       player.setVelocityY(-100);
       player.anims.play('right', true);
+    }else if (direction == "left" && this.cursors.up.isDown){
+      direction = "left";
+      player.setVelocityY(-100);
+      player.anims.play('left', true);
+    }else if (direction == "left" && this.cursors.down.isDown){
+      direction = "left";
+      player.setVelocityY(100);
+      player.anims.play('left', true);
     }
-    if(this.cursors.space.isDown){
-      player.anims.play('attack', true);
+    if(direction == "left" && this.cursors.space.isDown){
+      direction = "left";
+      player.anims.play('attackLeft', true);
+    }else if(direction == "right" && this.cursors.space.isDown){
+      direction = "right";
+      player.anims.play('attackRight', true);
+    }
+    if(direction == "left" && this.cursors.shift.isDown){
+      direction = "left";
+      player.anims.play('SattackLeft', true);
+    }else if(direction == "right" && this.cursors.shift.isDown){
+      direction = "right";
+      player.anims.play('SattackRight', true);
     }
 
   // emit player movement
@@ -109,11 +131,29 @@ function create() {
       repeat: 1
   });
   this.anims.create({
-    key: 'attack',
+    key: 'attackLeft',
     frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
     frameRate: 10,
     repeat: 1
 });
+  this.anims.create({
+    key: 'attackRight',
+    frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+    key: 'SattackRight',
+    frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+  key: 'SattackLeft',
+  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+  });
 
   this.cursors = this.input.keyboard.createCursorKeys();
   var self = this;
