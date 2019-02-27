@@ -25,13 +25,95 @@ function preload() {
   this.load.spritesheet('dudeAttack', 'assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
   this.load.spritesheet('SdudeAttack', 'assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
   this.load.spritesheet('otherPlayer', 'assets/nainrun.png', { frameWidth: 108, frameHeight: 80 });
-  this.load.image('star', 'assets/nain_champ/attack/attack4.png');
+  this.load.image('star', 'assets/star.png');
 }
 
+
+function update() {
+  // if(otherPlayer){
+  //   console.log(otherPlayer)
+  //   if (this.cursors.left.isDown) {
+  //     direction = "leftO";
+  //     otherPlayer.setVelocityX(-100);
+  //     otherPlayer.anims.play('left', true);
+
+  //   } else if (this.cursors.right.isDown) {
+  //     direction = "rightO";
+  //     otherPlayer.setVelocityX(100);
+  //     otherPlayer.anims.play('right', true);}
+  // }
+  if (this.ship) {
+    if (this.cursors.left.isDown) {
+      direction = "left";
+      this.ship.setVelocityX(-100);
+      this.ship.anims.play('left', true);
+
+    } else if (this.cursors.right.isDown) {
+      direction = "right";
+      this.ship.setVelocityX(100);
+      this.ship.anims.play('right', true);
+
+    } else if (direction == "right" && this.cursors.down.isDown) {
+      direction = "right";
+      this.ship.setVelocityY(100);
+      this.ship.anims.play('right', true);
+    } else if (direction == "right" && this.cursors.up.isDown) {
+      direction = "right";
+      this.ship.setVelocityY(-100);
+      this.ship.anims.play('right', true);
+    } else if (direction == "left" && this.cursors.up.isDown) {
+      direction = "left";
+      this.ship.setVelocityY(-100);
+      this.ship.anims.play('left', true);
+    } else if (direction == "left" && this.cursors.down.isDown) {
+      direction = "left";
+      this.ship.setVelocityY(100);
+      this.ship.anims.play('left', true);
+    }
+    if (direction == "left" && this.cursors.space.isDown) {
+      direction = "left";
+      this.ship.anims.play('attackLeft', true);
+    } else if (direction == "right" && this.cursors.space.isDown) {
+      direction = "right";
+      this.ship.anims.play('attackRight', true);
+    }
+    if (direction == "left" && this.cursors.shift.isDown) {
+      direction = "left";
+      this.ship.anims.play('SattackLeft', true);
+    } else if (direction == "right" && this.cursors.shift.isDown) {
+      direction = "right";
+      this.ship.anims.play('SattackRight', true);
+    }
+    1
+
+    // emit player movement
+    var x = this.ship.x;
+    var y = this.ship.y;
+    var r = this.ship.rotation;
+    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
+      this.socket.emit('this.shipMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
+    }
+
+    // save old position data
+    this.ship.oldPosition = {
+      x: this.ship.x,
+      y: this.ship.y,
+      rotation: this.ship.rotation
+    };
+  }
+
+}
 function create() {
-  player = this.physics.add.sprite(100, 350, 'dude');
-  player.setCollideWorldBounds(true);
+  this.ship = this.physics.add.sprite(100, 350, 'dude');
+  this.ship.setCollideWorldBounds(true);
+
+
+  var self = this;
+  this.socket = io();
+
+  this.otherPlayers = this.physics.add.group();
   this.cursors = this.input.keyboard.createCursorKeys();
+
   this.anims.create({
     key: 'leftO',
     frames: this.anims.generateFrameNumbers('otherPlayer', { start: 0, end: 2 }),
@@ -84,15 +166,12 @@ function create() {
     repeat: 1
   });
 
-  var self = this;
-  this.socket = io();
-
-  this.otherPlayers = this.physics.add.group();
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         addPlayer(self, players[id]);
+
       } else {
         addOtherPlayers(self, players[id]);
       }
@@ -109,6 +188,7 @@ function create() {
         otherPlayer.destroy();
       }
     });
+  });
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
     
@@ -116,8 +196,14 @@ function create() {
     self.blueScoreText.setText('Blue: ' + scores.blue);
     self.redScoreText.setText('Red: ' + scores.red);
   });
-  });
 
+  this.socket.on('starLocation', function (starLocation) {
+    if (self.star) self.star.destroy();
+    self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
+    self.physics.add.overlap(self.ship, self.star, function () {
+      this.socket.emit('starCollected');
+    }, null, self);
+  });
 
   this.socket.on('playerMoved', function (playerInfo) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
@@ -128,94 +214,18 @@ function create() {
     });
   });
 }
-
-function update() {
-  // if(otherPlayer){
-  //   console.log(otherPlayer)
-  //   if (this.cursors.left.isDown) {
-  //     direction = "leftO";
-  //     otherPlayer.setVelocityX(-100);
-  //     otherPlayer.anims.play('left', true);
-
-  //   } else if (this.cursors.right.isDown) {
-  //     direction = "rightO";
-  //     otherPlayer.setVelocityX(100);
-  //     otherPlayer.anims.play('right', true);}
-  // }
-  if (player) {
-    if (this.cursors.left.isDown) {
-      direction = "left";
-      player.setVelocityX(-100);
-      player.anims.play('left', true);
-
-    } else if (this.cursors.right.isDown) {
-      direction = "right";
-      player.setVelocityX(100);
-      player.anims.play('right', true);
-
-    } else if (direction == "right" && this.cursors.down.isDown) {
-      direction = "right";
-      player.setVelocityY(100);
-      player.anims.play('right', true);
-    } else if (direction == "right" && this.cursors.up.isDown) {
-      direction = "right";
-      player.setVelocityY(-100);
-      player.anims.play('right', true);
-    } else if (direction == "left" && this.cursors.up.isDown) {
-      direction = "left";
-      player.setVelocityY(-100);
-      player.anims.play('left', true);
-    } else if (direction == "left" && this.cursors.down.isDown) {
-      direction = "left";
-      player.setVelocityY(100);
-      player.anims.play('left', true);
-    }
-    if (direction == "left" && this.cursors.space.isDown) {
-      direction = "left";
-      player.anims.play('attackLeft', true);
-    } else if (direction == "right" && this.cursors.space.isDown) {
-      direction = "right";
-      player.anims.play('attackRight', true);
-    }
-    if (direction == "left" && this.cursors.shift.isDown) {
-      direction = "left";
-      player.anims.play('SattackLeft', true);
-    } else if (direction == "right" && this.cursors.shift.isDown) {
-      direction = "right";
-      player.anims.play('SattackRight', true);
-    }
-    1
-
-    // emit player movement
-    var x = player.x;
-    var y = player.y;
-    var r = player.rotation;
-    if (player.oldPosition && (x !== player.oldPosition.x || y !== player.oldPosition.y || r !== player.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: player.x, y: player.y, rotation: player.rotation });
-    }
-
-    // save old position data
-    player.oldPosition = {
-      x: player.x,
-      y: player.y,
-      rotation: player.rotation
-    };
-  }
-
-}
-
 function addPlayer(self, playerInfo) {
-  // player = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
+  // self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
   //   .setOrigin(0.5, 0.5).setDisplaySize(83, 80);
 
   if (playerInfo.team === 'blue') {
-    player.setTint(0x0000ff);
+    self.ship.setTint(0x0000ff);
   } else {
-    player.setTint(0xff0000);
+    self.ship.setTint(0xff0000);
   }
-  player.setDrag(100);
-  player.setAngularDrag(100);
-  player.setMaxVelocity(70);
+  self.ship.setDrag(100);
+  self.ship.setAngularDrag(100);
+  self.ship.setMaxVelocity(70);
 }
 function addOtherPlayers(self, playerInfo) {
   const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
