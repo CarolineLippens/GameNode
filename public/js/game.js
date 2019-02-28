@@ -19,6 +19,7 @@ var config = {
 
 var game = new Phaser.Game(config);
 let direction = 0, player, otherPlayer;
+let teamBlue = [], teamRed = [];
 function preload() {
 
   this.load.spritesheet('dude', 'assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
@@ -30,18 +31,7 @@ function preload() {
 
 
 function update() {
-  // if(otherPlayer){
-  //   console.log(otherPlayer)
-  //   if (this.cursors.left.isDown) {
-  //     direction = "leftO";
-  //     otherPlayer.setVelocityX(-100);
-  //     otherPlayer.anims.play('left', true);
 
-  //   } else if (this.cursors.right.isDown) {
-  //     direction = "rightO";
-  //     otherPlayer.setVelocityX(100);
-  //     otherPlayer.anims.play('right', true);}
-  // }
   if (this.ship) {
     if (this.cursors.left.isDown) {
       direction = "left";
@@ -73,16 +63,20 @@ function update() {
     if (direction == "left" && this.cursors.space.isDown) {
       direction = "left";
       this.ship.anims.play('attackLeft', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     } else if (direction == "right" && this.cursors.space.isDown) {
       direction = "right";
       this.ship.anims.play('attackRight', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     }
     if (direction == "left" && this.cursors.shift.isDown) {
       direction = "left";
       this.ship.anims.play('SattackLeft', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
       this.ship.anims.play('SattackRight', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     }
     // emit player movement
     var x = this.ship.x;
@@ -103,15 +97,17 @@ function update() {
 
 }
 function create() {
+  
   this.ship = this.physics.add.sprite(100, 350, 'dude');
   this.ship.setCollideWorldBounds(true);
-
-
   var self = this;
   this.socket = io();
-
+  
   this.otherPlayers = this.physics.add.group();
+  
   this.cursors = this.input.keyboard.createCursorKeys();
+  
+  
 
   this.anims.create({
     key: 'leftO',
@@ -212,15 +208,20 @@ function create() {
       }
     });
   });
+  console.log(this.ship.team);
+  console.log(this.otherPlayers.playerId);
+  
 }
 function addPlayer(self, playerInfo) {
   // self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
   //   .setOrigin(0.5, 0.5).setDisplaySize(83, 80);
-
   if (playerInfo.team === 'blue') {
     self.ship.setTint(0x0000ff);
+    teamBlue.push(playerInfo.playerId);
+
   } else {
     self.ship.setTint(0xff0000);
+    teamRed.push(playerInfo.playerId);
   }
   self.ship.setDrag(100);
   self.ship.setAngularDrag(100);
@@ -230,9 +231,14 @@ function addOtherPlayers(self, playerInfo) {
   const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
   if (playerInfo.team === 'blue') {
     otherPlayer.setTint(0x0000ff);
+    teamBlue.push(playerInfo.playerId);
   } else {
     otherPlayer.setTint(0xff0000);
+    teamRed.push(playerInfo.playerId);
   }
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
+  
 }
+console.log(teamBlue);
+console.log(teamRed);
