@@ -65,7 +65,7 @@ function preload() {
 
 function degat(){
 
-  this.socket.emit('attaque',0.5);
+  this.socket.emit('attaque',1);
 
 }
 function update() {
@@ -111,29 +111,27 @@ function update() {
       this.ship.anims.play('attackLeft', true);
       // console.log(this.otherPlayers.children.entries[0].playerId);
       this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
-      this.socket.emit('attaque');
+      
 
     } else if (direction == "right" && this.cursors.space.isDown) {
       direction = "right";
       this.ship.anims.play('attackRight', true);
-      this.physics.add.collider(this.ship, this.otherPlayers);
-      this.socket.emit('attaque');
+      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      
 
     }
     if (direction == "left" && this.cursors.shift.isDown) {
       direction = "left";
       this.ship.anims.play('SattackLeft', true);
       
-      this.physics.add.collider(this.ship, this.otherPlayers);
-      this.socket.emit('attaque');
+      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      
 
     } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
       this.ship.anims.play('SattackRight', true);
 
-      this.physics.add.collider(this.ship, this.otherPlayers, function(){
-        this.socket.emit('attaque');
-      });
+      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
     }
 
     // emit player movement
@@ -176,13 +174,13 @@ function create() {
   const tileset1 = map.addTilesetImage("Map caro", "Map");
   const tileset2 = map.addTilesetImage("tile1","tile1");
 
-
+  let positionXBlue = 1000, positionYBlue = 350;
+  let positionXRed = 100, positionYRed = 350;
   // Parameters: layer name (or index) from Tiled, tileset, x, y
   const worldLayer = map.createStaticLayer("Border", tileset1, 0, 0).setScale(0.5);
   const belowLayer = map.createStaticLayer("Backgrounds", tileset1, 0, 0).setScale(0.5);
   const aboveLayer = map.createStaticLayer("Colliders", tileset2, 0, 0);
   //
-  
   // CREE BLUE
   if (random < 3) {
     this.ship = this.physics.add.sprite(100, 350, 'dude');
@@ -462,20 +460,20 @@ function addOtherPlayers(self, playerInfo) {
   //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
    // CREE BLUE
    if (randomOP < 3) {
-    otherPlayer = self.physics.add.sprite(100, 350, 'dude')
+    otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'dude')
   }
   // CREE UN MINAUTORE
   else if(randomOP >= 3 && randomOP <= 5 ) {
-    otherPlayer = self.physics.add.sprite(100, 350, 'minautore')
+    otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'minautore')
   }
  // CREE UN NAIN
   else if(randomOP > 5 && randomOP < 8 ) {
-    otherPlayer = self.physics.add.sprite(100, 350, 'nain').setDisplaySize(90, 70)
+    otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'nain').setDisplaySize(90, 70)
   }
 
   //CREE PERE NOEL
   else if(randomOP >=8 && randomOP <=10) {
-    otherPlayer = self.physics.add.sprite(100, 350, 'noel').setDisplaySize(80, 65)
+    otherPlayer = self.physics.add.sprite(playerInfo.x, playerInfo.y, 'noel').setDisplaySize(80, 65)
   }
   if (playerInfo.team === 'blue') {
 
