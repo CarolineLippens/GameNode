@@ -26,8 +26,6 @@ io.on('connection', function (socket) {
     rotation: 0,
     x: Math.floor(Math.random() * 700) + 50,
     y: Math.floor(Math.random() * 500) + 50,
-    x: 50,
-    y: 300,
     playerId: socket.id,
     team: (Math.floor(Math.random() * 2) == 0) ? 'red' : 'blue'
   };
@@ -71,6 +69,7 @@ io.on('connection', function (socket) {
     io.emit('starLocation', star);
     io.emit('scoreUpdate', scores);
   });
+
   socket.on('attaque',function(){
     if (players[socket.id].team === 'blue') {
       scores.red += (1*-1);
