@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-example',
@@ -22,8 +23,32 @@ const game = new Phaser.Game(config);
 let marche, direction;
 let random = parseInt(Math.random() * 10);
 let randomOP = parseInt(Math.random() * 10);
+=======
+var config = {
+  type: Phaser.AUTO,
+  parent: 'phaser-example',
+  width: 800,
+  height: 600,
+  physics: {
+    default: 'arcade',
+    arcade: {
+      debug: true,
+      gravity: { y: 0 }
+    }
+  },
+  scene: {
+    preload: preload,
+    create: create,
+    update: update
+  }
+};
+>>>>>>> 48897b866986a0e9394468d4d399175a2100b30a
 
+var game = new Phaser.Game(config);
+let direction = 0, player, otherPlayer;
+let teamBlue = [], teamRed = [];
 function preload() {
+<<<<<<< HEAD
   	
 // BLUE 
   this.load.spritesheet('dude','assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
@@ -63,74 +88,85 @@ function addPlayer(self, playerInfo) {
   player.setDrag(100);
   player.setAngularDrag(100);
   player.setMaxVelocity(70);
+=======
+
+  this.load.spritesheet('dude', 'assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
+  this.load.spritesheet('dudeAttack', 'assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
+  this.load.spritesheet('SdudeAttack', 'assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
+  this.load.spritesheet('otherPlayer', 'assets/nainrun.png', { frameWidth: 108, frameHeight: 80 });
+  this.load.image('star', 'assets/star.png');
+>>>>>>> 48897b866986a0e9394468d4d399175a2100b30a
 }
 
 
+function update() {
 
-function update() {  
-  
-  if (player) {
+  if (this.ship) {
     if (this.cursors.left.isDown) {
       direction = "left";
-      player.setVelocityX(-100);
-      player.anims.play('left', true);
+      this.ship.setVelocityX(-100);
+      this.ship.anims.play('left', true);
 
     } else if (this.cursors.right.isDown) {
       direction = "right";
-      player.setVelocityX(100);
-      player.anims.play('right', true);
+      this.ship.setVelocityX(100);
+      this.ship.anims.play('right', true);
 
-    } else if (direction == "right" && this.cursors.down.isDown){
+    } else if (direction == "right" && this.cursors.down.isDown) {
       direction = "right";
-      player.setVelocityY(100);
-      player.anims.play('right', true);
-    }else if (direction == "right" && this.cursors.up.isDown){
+      this.ship.setVelocityY(100);
+      this.ship.anims.play('right', true);
+    } else if (direction == "right" && this.cursors.up.isDown) {
       direction = "right";
-      player.setVelocityY(-100);
-      player.anims.play('right', true);
-    }else if (direction == "left" && this.cursors.up.isDown){
+      this.ship.setVelocityY(-100);
+      this.ship.anims.play('right', true);
+    } else if (direction == "left" && this.cursors.up.isDown) {
       direction = "left";
-      player.setVelocityY(-100);
-      player.anims.play('left', true);
-    }else if (direction == "left" && this.cursors.down.isDown){
+      this.ship.setVelocityY(-100);
+      this.ship.anims.play('left', true);
+    } else if (direction == "left" && this.cursors.down.isDown) {
       direction = "left";
-      player.setVelocityY(100);
-      player.anims.play('left', true);
+      this.ship.setVelocityY(100);
+      this.ship.anims.play('left', true);
     }
-    if(direction == "left" && this.cursors.space.isDown){
+    if (direction == "left" && this.cursors.space.isDown) {
       direction = "left";
-      player.anims.play('attackLeft', true);
-    }else if(direction == "right" && this.cursors.space.isDown){
+      this.ship.anims.play('attackLeft', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
+    } else if (direction == "right" && this.cursors.space.isDown) {
       direction = "right";
-      player.anims.play('attackRight', true);
+      this.ship.anims.play('attackRight', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     }
-    if(direction == "left" && this.cursors.shift.isDown){
+    if (direction == "left" && this.cursors.shift.isDown) {
       direction = "left";
-      player.anims.play('SattackLeft', true);
-    }else if(direction == "right" && this.cursors.shift.isDown){
+      this.ship.anims.play('SattackLeft', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
+    } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
-      player.anims.play('SattackRight', true);
+      this.ship.anims.play('SattackRight', true);
+      this.physics.add.collider(this.ship, this.otherPlayers);
     }
-
-  // emit player movement
-    var x = player.x;
-    var y = player.y;
-    var r = player.rotation;
-    if (player.oldPosition && (x !== player.oldPosition.x || y !== player.oldPosition.y || r !== player.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: player.x, y: player.y, rotation: player.rotation });
+    // emit player movement
+    var x = this.ship.x;
+    var y = this.ship.y;
+    var r = this.ship.rotation;
+    if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
+      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
     }
     
+
     // save old position data
-    player.oldPosition = {
-      x: player.x,
-      y: player.y,
-      rotation: player.rotation
-};
-    
+    this.ship.oldPosition = {
+      x: this.ship.x,
+      y: this.ship.y,
+      rotation: this.ship.rotation
+    };
   }
-}
 
+}
 function create() {
+<<<<<<< HEAD
 
   // CREE BLUE
   if (random < 3) {
@@ -155,25 +191,53 @@ function create() {
   player.setCollideWorldBounds(true);
  //ANIMATIONS BLUE
   if (random < 3) {
+=======
+  
+  this.ship = this.physics.add.sprite(100, 350, 'dude');
+  this.ship.setCollideWorldBounds(true);
+  var self = this;
+  this.socket = io();
+  
+  this.otherPlayers = this.physics.add.group();
+  
+  this.cursors = this.input.keyboard.createCursorKeys();
+  
+  
+
   this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
-      frameRate: 10,
-      repeat: 1
+    key: 'leftO',
+    frames: this.anims.generateFrameNumbers('otherPlayer', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+
+>>>>>>> 48897b866986a0e9394468d4d399175a2100b30a
+  this.anims.create({
+    key: 'rightO',
+    frames: this.anims.generateFrameNumbers('otherPlayer', { start: 3, end: 5 }),
+    frameRate: 10,
+    repeat: 1
   });
 
   this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 5 }),
-      frameRate: 10,
-      repeat: 1
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+
+  this.anims.create({
+    key: 'right',
+    frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 5 }),
+    frameRate: 10,
+    repeat: 1
   });
   this.anims.create({
     key: 'attackLeft',
     frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
     frameRate: 10,
     repeat: 1
-});
+  });
   this.anims.create({
     key: 'attackRight',
     frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
@@ -187,10 +251,10 @@ function create() {
     repeat: 1
   });
   this.anims.create({
-  key: 'SattackLeft',
-  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
-  frameRate: 10,
-  repeat: 1
+    key: 'SattackLeft',
+    frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
   });
 } 
 //ANIMATIONS MINAUTORE
@@ -321,23 +385,18 @@ repeat: 1
 
 
 
-  this.cursors = this.input.keyboard.createCursorKeys();
-  var self = this;
-
-  this.socket = io();
-  this.otherPlayers = this.physics.add.group();
 
   this.socket.on('currentPlayers', function (players) {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         addPlayer(self, players[id]);
+
       } else {
         addOtherPlayers(self, players[id]);
       }
     });
   });
 
-// ajout d 'un autre player
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
   });
@@ -349,35 +408,51 @@ repeat: 1
       }
     });
   });
-  
-  //Controle le mouvement de l'autre joueur
-  this.socket.on('playerMoved', function (playerInfo) {
-    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
-      if (playerInfo.playerId === otherPlayer.playerId) {
-        // otherPlayer.setRotation(playerInfo.rotation);
-        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
-      }
-    });
-  });
-  // Affichage de score
   this.blueScoreText = this.add.text(16, 16, '', { fontSize: '32px', fill: '#0000FF' });
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
     
   this.socket.on('scoreUpdate', function (scores) {
     self.blueScoreText.setText('Blue: ' + scores.blue);
     self.redScoreText.setText('Red: ' + scores.red);
-    // Affichage des étoiles
   });
-  this.socket.on('starLocation', function (starLocation) {
-    // if (self.star) self.star.destroy();
-    // self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
-    // self.physics.add.overlap(self.ship, self.star, function () {
-    //   this.socket.emit('starCollected');
-    // }, null, self);
-  });
-}
 
+  this.socket.on('starLocation', function (starLocation) {
+    if (self.star) self.star.destroy();
+    self.star = self.physics.add.image(starLocation.x, starLocation.y, 'star');
+    self.physics.add.overlap(self.ship, self.star, function () {
+      this.socket.emit('starCollected');
+    }, null, self);
+  });
+
+  this.socket.on('playerMoved', function (playerInfo) {
+    self.otherPlayers.getChildren().forEach(function (otherPlayer) {
+      if (playerInfo.playerId === otherPlayer.playerId) {
+        otherPlayer.setRotation(playerInfo.rotation);
+        otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+      }
+    });
+  });
+  console.log(this.ship.team);
+  console.log(this.otherPlayers.playerId);
+  
+}
+function addPlayer(self, playerInfo) {
+  // self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
+  //   .setOrigin(0.5, 0.5).setDisplaySize(83, 80);
+  if (playerInfo.team === 'blue') {
+    self.ship.setTint(0x0000ff);
+    teamBlue.push(playerInfo.playerId);
+
+  } else {
+    self.ship.setTint(0xff0000);
+    teamRed.push(playerInfo.playerId);
+  }
+  self.ship.setDrag(100);
+  self.ship.setAngularDrag(100);
+  self.ship.setMaxVelocity(70);
+}
 function addOtherPlayers(self, playerInfo) {
+<<<<<<< HEAD
  // const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5);
     // CREE BLUE
     if (randomOP < 3) {
@@ -401,6 +476,19 @@ function addOtherPlayers(self, playerInfo) {
   // } else {
   //   otherPlayer.setTint(0xff0000);
   // }
+=======
+  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
+  if (playerInfo.team === 'blue') {
+    otherPlayer.setTint(0x0000ff);
+    teamBlue.push(playerInfo.playerId);
+  } else {
+    otherPlayer.setTint(0xff0000);
+    teamRed.push(playerInfo.playerId);
+  }
+>>>>>>> 48897b866986a0e9394468d4d399175a2100b30a
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
+  
 }
+console.log(teamBlue);
+console.log(teamRed);
