@@ -22,7 +22,10 @@ let direction = 0, player, otherPlayer;
 let teamBlue = [], teamRed = [];
 let MainPlayerTeam, OtherPlayerTeam;
 let random = parseInt(Math.random() * 10);
-let randomOP = parseInt(Math.random() * 10);
+
+
+
+
 
 function preload() {
     //Sound
@@ -73,6 +76,7 @@ function update() {
   this.ship.setMaxVelocity(x, y);
   if (this.ship) {
     //Les déplacments
+    this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
     if (this.cursors.left.isDown) {
       direction = "left";
       this.ship.setVelocityX(-100);
@@ -110,13 +114,13 @@ function update() {
       direction = "left";
       this.ship.anims.play('attackLeft', true);
       // console.log(this.otherPlayers.children.entries[0].playerId);
-      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      // this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
       
 
     } else if (direction == "right" && this.cursors.space.isDown) {
       direction = "right";
       this.ship.anims.play('attackRight', true);
-      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      // this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
       
 
     }
@@ -124,14 +128,14 @@ function update() {
       direction = "left";
       this.ship.anims.play('SattackLeft', true);
       
-      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      // this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
       
 
     } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
       this.ship.anims.play('SattackRight', true);
 
-      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+      // this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
     }
 
     // emit player movement
@@ -457,6 +461,12 @@ function addPlayer(self, playerInfo) {
   self.ship.setMaxVelocity(70);
 }
 function addOtherPlayers(self, playerInfo) {
+  let randomOP = parseInt(Math.random() * 10);
+  setInterval(function(){ 
+    randomOP = parseInt(Math.random() * 10);
+    console.log(randomOP);
+   }, 1000);
+
   //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
    // CREE BLUE
    if (randomOP < 3) {
