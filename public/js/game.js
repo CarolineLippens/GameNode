@@ -1,7 +1,7 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
+  width: 1000,
   height: 600,
   physics: {
     default: 'arcade',
@@ -29,10 +29,16 @@ function preload() {
   this.load.image('star', 'assets/star.png');
 }
 
+function degat(){
 
+  this.socket.emit('attaque',0.5);
+
+}
 function update() {
+  
   this.ship.setMaxVelocity(x, y);
   if (this.ship) {
+    //Les déplacments
     if (this.cursors.left.isDown) {
       direction = "left";
       this.ship.setVelocityX(-100);
@@ -60,25 +66,30 @@ function update() {
       direction = "left";
       this.ship.setVelocityY(100);
       this.ship.anims.play('left', true);
-    }
+    }//les Attaques
     if (direction == "left" && this.cursors.space.isDown) {
       direction = "left";
       this.ship.anims.play('attackLeft', true);
-      this.physics.add.collider(this.ship, this.otherPlayers);
+
+      this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
+
     } else if (direction == "right" && this.cursors.space.isDown) {
       direction = "right";
       this.ship.anims.play('attackRight', true);
+
       this.physics.add.collider(this.ship, this.otherPlayers);
 
     }
     if (direction == "left" && this.cursors.shift.isDown) {
       direction = "left";
       this.ship.anims.play('SattackLeft', true);
+
       this.physics.add.collider(this.ship, this.otherPlayers);
 
     } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
       this.ship.anims.play('SattackRight', true);
+
       this.physics.add.collider(this.ship, this.otherPlayers, function(){
         this.socket.emit('attaque');
       });
@@ -193,9 +204,10 @@ function create() {
   this.redScoreText = this.add.text(584, 16, '', { fontSize: '32px', fill: '#FF0000' });
     
   this.socket.on('scoreUpdate', function (scores) {
-    self.blueScoreText.setText('Blue: ' + scores.blue);
-    self.redScoreText.setText('Red: ' + scores.red);
+    self.blueScoreText.setText('Team Blue: ' + scores.blue);
+    self.redScoreText.setText('Team Red: ' + scores.red);
   });
+
 
   this.socket.on('starLocation', function (starLocation) {
     if (self.star) self.star.destroy();
@@ -245,5 +257,5 @@ function addOtherPlayers(self, playerInfo) {
   self.otherPlayers.add(otherPlayer);
   
 }
-console.log(teamBlue);
-console.log(teamRed);
+// console.log(teamBlue);
+// console.log(teamRed);

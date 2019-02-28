@@ -71,13 +71,13 @@ io.on('connection', function (socket) {
     io.emit('starLocation', star);
     io.emit('scoreUpdate', scores);
   });
-  socket.on('attaque',function(){
+  socket.on('attaque',function(number){
     if (players[socket.id].team === 'red') {
-      scores.red -= 10;
+      scores.red -= number;
     } else {
-      scores.blue -= 10;
+      scores.blue -= number;
     }
-    io.emit('attaque', scores);
+    io.emit('scoreUpdate', scores);
   })
 });
 server.listen(3000, function () {
