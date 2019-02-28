@@ -22,7 +22,10 @@ let direction = 0, player, otherPlayer;
 let teamBlue = [], teamRed = [];
 let MainPlayerTeam, OtherPlayerTeam;
 let random = parseInt(Math.random() * 10);
-let randomOP = parseInt(Math.random() * 10);
+
+
+
+
 
 function preload() {
     //Sound
@@ -457,6 +460,12 @@ function addPlayer(self, playerInfo) {
   self.ship.setMaxVelocity(70);
 }
 function addOtherPlayers(self, playerInfo) {
+  let randomOP = parseInt(Math.random() * 10);
+  setInterval(function(){ 
+    randomOP = parseInt(Math.random() * 10);
+    console.log(randomOP);
+   }, 1000);
+
   //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
    // CREE BLUE
    if (randomOP < 3) {
