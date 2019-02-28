@@ -71,16 +71,25 @@ io.on('connection', function (socket) {
     io.emit('starLocation', star);
     io.emit('scoreUpdate', scores);
   });
-  socket.on('attaque',function(number){
-    if (players[socket.id].team === 'red') {
-      scores.red -= number;
-    } else {
-      scores.blue -= number;
+  socket.on('attaque',function(){
+    if (players[socket.id].team === 'blue') {
+      scores.red += (1*-1);
+      if (scores.red === 0 ) {
+        scores.red = 500
+        scores.blue = 500
+        
+      }
+    } else if (players[socket.id].team === 'red') {
+      scores.blue += (1*-1);
+      if (scores.blue === 0 ) {
+        scores.red = 500
+        scores.blue = 500
+        
+      }
     }
-    // io.emit('scoreUpdate', scores);
+    io.emit('scoreUpdate', scores);
   })
 });
-
 server.listen(3000, function () {
   console.log(`Listening on ${server.address().port}`);
 });
