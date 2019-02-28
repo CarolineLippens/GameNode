@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 1500,
+  height: 900,
   physics: {
     default: 'arcade',
     arcade: {
@@ -21,6 +21,21 @@ var game = new Phaser.Game(config);
 let direction = 0, player, otherPlayer;
 let teamBlue = [], teamRed = [];
 function preload() {
+  
+  //Sound
+  //1 Fond
+  this.load.audio('music', 'assets/audio/battleThemeB.mp3');
+  //MAP
+  //1
+    this.load.image('fond','assets/Background.png');
+    this.load.image('wall','assets/border.png');
+  //2
+    this.load.image("Map", "assets/tilesets/Map.jpg");
+    this.load.image("tiles", "assets/tilesets/server_objects.png");
+    this.load.image("tile1", "assets/tilesets/tile1.png");
+    this.load.image("walkable", "assets/tilesets/walkable.png");
+    this.load.tilemapTiledJSON("map", "assets/tilemaps/MAPUF3.json");
+    //
 
   this.load.spritesheet('dude', 'assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
   this.load.spritesheet('dudeAttack', 'assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
@@ -101,8 +116,34 @@ function update() {
   }
 
 }
+var platforms;
 function create() {
-  
+  //Sound
+  //1
+  let musicSnd = this.sound.add('music');
+    musicSnd.play();
+  //MAP
+  //1
+ /* this.add.image(750,450,'fond');
+
+  platforms = this.physics.add.staticGroup();
+
+  platforms.create(750, 450, 'wall');
+  this.physics.add.collider(ship, platforms);*/
+
+  //2
+   const map = this.make.tilemap({ key: "map" });
+  // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+  // Phaser's cache (i.e. the name you used in preload)
+  const tileset1 = map.addTilesetImage("Map caro", "Map");
+  const tileset2 = map.addTilesetImage("tile1","tile1");
+
+
+  // Parameters: layer name (or index) from Tiled, tileset, x, y
+  const worldLayer = map.createStaticLayer("Border", tileset1, 0, 0).setScale(0.5);
+  const belowLayer = map.createStaticLayer("Backgrounds", tileset1, 0, 0).setScale(0.5);
+  const aboveLayer = map.createStaticLayer("Colliders", tileset2, 0, 0);
+  //
   this.ship = this.physics.add.sprite(100, 350, 'dude');
   this.ship.setCollideWorldBounds(true);
   var self = this;
