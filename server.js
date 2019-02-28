@@ -26,16 +26,12 @@ io.on('connection', function (socket) {
   if((cpt % 2) === 0){
     players[socket.id] = {
       rotation: 0,
-      x: Math.floor(Math.random() * 700) + 50,
-      y: Math.floor(Math.random() * 500) + 50,
       playerId: socket.id,
       team: 'blue'
     };
   }else{
     players[socket.id] = {
       rotation: 0,
-      x: Math.floor(Math.random() * 700) + 50,
-      y: Math.floor(Math.random() * 500) + 50,
       playerId: socket.id,
       team: 'red'
     };
@@ -101,6 +97,6 @@ io.on('connection', function (socket) {
     io.emit('scoreUpdate', scores);
   })
 });
-server.listen(3000, function () {
+server.listen(process.env.PORT || 3000, function () {
   console.log(`Listening on ${server.address().port}`);
 });
