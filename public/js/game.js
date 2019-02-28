@@ -6,7 +6,7 @@ const config = {
     physics: {
       default: 'arcade',
       arcade: {
-        debug: false,
+        debug: true,
         gravity: { y: 0 }
       }
     },
@@ -21,6 +21,7 @@ const config = {
 const game = new Phaser.Game(config);
 let marche, direction;
 let random = parseInt(Math.random() * 10);
+let randomOP = parseInt(Math.random() * 10);
 
 function preload() {
   	
@@ -30,21 +31,29 @@ function preload() {
   this.load.spritesheet('SdudeAttack','assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
 
 // MINAUTORE
-  this.load.spritesheet('minautore', 'assets/minaurun.png', {frameWidth: 110, frameHeight: 80});
-  this.load.spritesheet('minauAttack','assets/minauattack.png', { frameWidth: 108, frameHeight: 80 });
+  this.load.spritesheet('minautore', 'assets/minaurun.png', {frameWidth: 104, frameHeight: 80});
+  this.load.spritesheet('minauAttack','assets/minauattack.png', { frameWidth: 142, frameHeight: 130 });
+  this.load.spritesheet('SminauAttack','assets/minausuperattack.png', { frameWidth: 144, frameHeight: 85 });
 
 // NAIN
-  this.load.spritesheet('nain', 'assets/nainrun.png', {frameWidth: 140, frameHeight: 80});
+  this.load.spritesheet('nain', 'assets/nainrun.png', {frameWidth: 134, frameHeight: 80});
+  this.load.spritesheet('nainAttack','assets/nainattack.png', { frameWidth: 115, frameHeight: 99 });
+  this.load.spritesheet('SnainAttack','assets/nainsuperattack.png', { frameWidth: 100, frameHeight: 80 });
 
-
+  //PERE NOEL
+  this.load.spritesheet('noel', 'assets/noelrun.png', {frameWidth: 55, frameHeight: 55});
+  this.load.spritesheet('noelAttack','assets/noelattack.png', { frameWidth: 58, frameHeight: 55 });
+  this.load.spritesheet('SnoelAttack','assets/noelsuperattack.png', { frameWidth: 64, frameHeight: 60 });
+  //RED
+  //this.load.spritesheet('red', 'assets/redrun.png', {frameWidth: 75, frameHeight: 80});
   // OTHER PLAYER
- // this.load.spritesheet('otherPlayer', 'assets/minaurun.png', {frameWidth: 80, frameHeight: 80});
+ //this.load.spritesheet('otherPlayer', 'assets/minaurun.png', {frameWidth: 80, frameHeight: 80});
 
   
 }
 
 function addPlayer(self, playerInfo) {
-  self.ship = self.physics.add.image(playerInfo.x, playerInfo.y);
+  self.player = self.physics.add.image(playerInfo.x, playerInfo.y);
     //  'ship').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
   // if (playerInfo.team === '') {
   //   self.ship.setTint(0x0000ff);
@@ -133,12 +142,15 @@ function create() {
   }
  // CREE UN NAIN
   else if(random > 5 && random < 8 ) {
-    player = this.physics.add.sprite(100, 350, 'nain');
+    player = this.physics.add.sprite(100, 350, 'nain').setDisplaySize(90, 70);
   }
 
-  else {
-    player = this.physics.add.sprite(100, 350, 'nain');
+  //CREE PERE NOEL
+  else if(random >=8 && random <=10) {
+    player = this.physics.add.sprite(100, 350, 'noel').setDisplaySize(80, 65);
   }
+
+
   // player.setBounce(0.2);
   player.setCollideWorldBounds(true);
  //ANIMATIONS BLUE
@@ -192,7 +204,7 @@ else if (random >= 3 && random <= 5) {
 
 this.anims.create({
     key: 'right',
-    frames: this.anims.generateFrameNumbers('minautore', { start: 3, end: 6 }),
+    frames: this.anims.generateFrameNumbers('minautore', { start: 3, end: 5 }),
     frameRate: 10,
     repeat: 1
 });
@@ -204,26 +216,26 @@ this.anims.create({
 });
 this.anims.create({
   key: 'attackRight',
-  frames: this.anims.generateFrameNumbers('minauAttack', { start: 3, end: 6 }),
+  frames: this.anims.generateFrameNumbers('minauAttack', { start: 3, end: 5 }),
   frameRate: 10,
   repeat: 1
 });
-/*
+
 this.anims.create({
   key: 'SattackRight',
-  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+  frames: this.anims.generateFrameNumbers('SminauAttack', { start: 0, end: 2 }),
   frameRate: 10,
   repeat: 1
 });
 this.anims.create({
 key: 'SattackLeft',
-frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+frames: this.anims.generateFrameNumbers('SminauAttack', { start: 3, end: 6 }),
 frameRate: 10,
 repeat: 1
-});*/
+});
 }
 //ANIMATIONS NAINS
-else if (random > 5 && random <= 10) {
+else if (random > 5 && random < 8) {
   this.anims.create({
     key: 'left',
     frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 2 }),
@@ -237,31 +249,75 @@ this.anims.create({
     frameRate: 10,
     repeat: 1
 });
-/*this.anims.create({
+this.anims.create({
   key: 'attackLeft',
-  frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
+  frames: this.anims.generateFrameNumbers('nainAttack', { start: 0, end: 2 }),
   frameRate: 10,
   repeat: 1
 });
 this.anims.create({
   key: 'attackRight',
-  frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
+  frames: this.anims.generateFrameNumbers('nainAttack', { start: 3, end: 6 }),
   frameRate: 10,
   repeat: 1
 });
+
 this.anims.create({
   key: 'SattackRight',
-  frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+  frames: this.anims.generateFrameNumbers('SnainAttack', { start: 0, end: 2 }),
   frameRate: 10,
   repeat: 1
 });
 this.anims.create({
 key: 'SattackLeft',
-frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
+frames: this.anims.generateFrameNumbers('SnainAttack', { start: 3, end: 6 }),
 frameRate: 10,
 repeat: 1
-});*/
+});
 }
+  //ANIMATIONS PERE NOEL
+else if (random >= 8 && random <= 10) {
+  this.anims.create({
+    key: 'left',
+    frames: this.anims.generateFrameNumbers('noel', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+});
+
+this.anims.create({
+    key: 'right',
+    frames: this.anims.generateFrameNumbers('noel', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
+});
+
+this.anims.create({
+  key: 'attackLeft',
+  frames: this.anims.generateFrameNumbers('noelAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+  key: 'attackRight',
+  frames: this.anims.generateFrameNumbers('noelAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+  key: 'SattackRight',
+  frames: this.anims.generateFrameNumbers('SnoelAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+});
+this.anims.create({
+key: 'SattackLeft',
+frames: this.anims.generateFrameNumbers('SnoelAttack', { start: 0, end: 2 }),
+frameRate: 10,
+repeat: 1
+});
+}
+
+
 
 
 
@@ -322,7 +378,24 @@ repeat: 1
 }
 
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5);
+ // const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5);
+    // CREE BLUE
+    if (randomOP < 3) {
+      otherPlayer = self.physics.add.sprite(100, 350, 'dude')
+    }
+    // CREE UN MINAUTORE
+    else if(randomOP >= 3 && randomOP <= 5 ) {
+      otherPlayer = self.physics.add.sprite(100, 350, 'minautore')
+    }
+   // CREE UN NAIN
+    else if(randomOP > 5 && randomOP < 8 ) {
+      otherPlayer = self.physics.add.sprite(100, 350, 'nain').setDisplaySize(90, 70)
+    }
+  
+    //CREE PERE NOEL
+    else if(randomOP >=8 && randomOP <=10) {
+      otherPlayer = self.physics.add.sprite(100, 350, 'noel').setDisplaySize(80, 65)
+    }
   // if (playerInfo.team === 'blue') {
   //   otherPlayer.setTint(0x0000ff);
   // } else {
