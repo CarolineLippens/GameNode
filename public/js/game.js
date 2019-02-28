@@ -47,6 +47,7 @@ function update() {
       direction = "right";
       this.ship.setVelocityY(100);
       this.ship.anims.play('right', true);
+      console.log(this.ship);
     } else if (direction == "right" && this.cursors.up.isDown) {
       direction = "right";
       this.ship.setVelocityY(-100);
@@ -68,11 +69,13 @@ function update() {
       direction = "right";
       this.ship.anims.play('attackRight', true);
       this.physics.add.collider(this.ship, this.otherPlayers);
+
     }
     if (direction == "left" && this.cursors.shift.isDown) {
       direction = "left";
       this.ship.anims.play('SattackLeft', true);
       this.physics.add.collider(this.ship, this.otherPlayers);
+
     } else if (direction == "right" && this.cursors.shift.isDown) {
       direction = "right";
       this.ship.anims.play('SattackRight', true);

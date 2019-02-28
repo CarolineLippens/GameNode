@@ -71,6 +71,14 @@ io.on('connection', function (socket) {
     io.emit('starLocation', star);
     io.emit('scoreUpdate', scores);
   });
+  socket.on('attaque',function(){
+    if (players[socket.id].team === 'red') {
+      scores.red -= 10;
+    } else {
+      scores.blue -= 10;
+    }
+    io.emit('attaque', scores);
+  })
 });
 server.listen(3000, function () {
   console.log(`Listening on ${server.address().port}`);
