@@ -1,8 +1,8 @@
 var config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: 1500,
+  height: 900,
   physics: {
     default: 'arcade',
     arcade: {
@@ -20,12 +20,44 @@ var config = {
 var game = new Phaser.Game(config);
 let direction = 0, player, otherPlayer;
 let teamBlue = [], teamRed = [];
+let random = parseInt(Math.random() * 10);
+let randomOP = parseInt(Math.random() * 10);
 function preload() {
+    //Sound
+  //1 Fond
+  this.load.audio('music', 'assets/audio/battleThemeB.mp3');
+  //MAP
+  //1
+    this.load.image('fond','assets/Background.png');
+    this.load.image('wall','assets/border.png');
+  //2
+    this.load.image("Map", "assets/tilesets/Map.jpg");
+    this.load.image("tiles", "assets/tilesets/server_objects.png");
+    this.load.image("tile1", "assets/tilesets/tile1.png");
+    this.load.image("walkable", "assets/tilesets/walkable.png");
+    this.load.tilemapTiledJSON("map", "assets/tilemaps/MAPUF3.json");
+    //
 
-  this.load.spritesheet('dude', 'assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
-  this.load.spritesheet('dudeAttack', 'assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
-  this.load.spritesheet('SdudeAttack', 'assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
-  this.load.spritesheet('otherPlayer', 'assets/nainrun.png', { frameWidth: 108, frameHeight: 80 });
+ // BLUE 
+ this.load.spritesheet('dude','assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
+ this.load.spritesheet('dudeAttack','assets/bluerunAttack.png', { frameWidth: 108, frameHeight: 80 });
+ this.load.spritesheet('SdudeAttack','assets/bluesuperattack.png', { frameWidth: 108, frameHeight: 80 });
+
+// MINAUTORE
+ this.load.spritesheet('minautore', 'assets/minaurun.png', {frameWidth: 104, frameHeight: 80});
+ this.load.spritesheet('minauAttack','assets/minauattack.png', { frameWidth: 142, frameHeight: 130 });
+ this.load.spritesheet('SminauAttack','assets/minausuperattack.png', { frameWidth: 144, frameHeight: 85 });
+
+// NAIN
+ this.load.spritesheet('nain', 'assets/nainrun.png', {frameWidth: 134, frameHeight: 80});
+ this.load.spritesheet('nainAttack','assets/nainattack.png', { frameWidth: 115, frameHeight: 99 });
+ this.load.spritesheet('SnainAttack','assets/nainsuperattack.png', { frameWidth: 100, frameHeight: 80 });
+
+ //PERE NOEL
+ this.load.spritesheet('noel', 'assets/noelrun.png', {frameWidth: 55, frameHeight: 55});
+ this.load.spritesheet('noelAttack','assets/noelattack.png', { frameWidth: 58, frameHeight: 55 });
+ this.load.spritesheet('SnoelAttack','assets/noelsuperattack.png', { frameWidth: 64, frameHeight: 60 });
+
   this.load.image('star', 'assets/star.png');
 }
 
@@ -100,8 +132,50 @@ function update() {
 
 }
 function create() {
+  //Sound
+  //1
+  let musicSnd = this.sound.add('music');
+    musicSnd.play();
+  //MAP
+  //1
+ /* this.add.image(750,450,'fond');
+
+  platforms = this.physics.add.staticGroup();
+
+  platforms.create(750, 450, 'wall');
+  this.physics.add.collider(ship, platforms);*/
+
+  //2
+   const map = this.make.tilemap({ key: "map" });
+  // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
+  // Phaser's cache (i.e. the name you used in preload)
+  const tileset1 = map.addTilesetImage("Map caro", "Map");
+  const tileset2 = map.addTilesetImage("tile1","tile1");
+
+
+  // Parameters: layer name (or index) from Tiled, tileset, x, y
+  const worldLayer = map.createStaticLayer("Border", tileset1, 0, 0).setScale(0.5);
+  const belowLayer = map.createStaticLayer("Backgrounds", tileset1, 0, 0).setScale(0.5);
+  const aboveLayer = map.createStaticLayer("Colliders", tileset2, 0, 0);
+  //
   
-  this.ship = this.physics.add.sprite(100, 350, 'dude');
+  // CREE BLUE
+  if (random < 3) {
+    this.ship = this.physics.add.sprite(100, 350, 'dude');
+  }
+  // CREE UN MINAUTORE
+  else if(random >= 3 && random <= 5 ) {
+    this.ship = this.physics.add.sprite(100, 350, 'minautore');
+  }
+ // CREE UN NAIN
+  else if(random > 5 && random < 8 ) {
+    this.ship = this.physics.add.sprite(100, 350, 'nain').setDisplaySize(90, 70);
+  }
+
+  //CREE PERE NOEL
+  else if(random >=8 && random <=10) {
+    this.ship = this.physics.add.sprite(100, 350, 'noel').setDisplaySize(80, 65);
+  }
   this.ship.setCollideWorldBounds(true);
   var self = this;
   this.socket = io();
@@ -126,43 +200,170 @@ function create() {
     repeat: 1
   });
 
-  this.anims.create({
-    key: 'left',
-    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
-    frameRate: 10,
-    repeat: 1
+   //ANIMATIONS BLUE
+   if (random < 3) {
+    this.anims.create({
+        key: 'left',
+        frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 2 }),
+        frameRate: 10,
+        repeat: 1
+    });
+  
+    this.anims.create({
+        key: 'right',
+        frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 5 }),
+        frameRate: 10,
+        repeat: 1
+    });
+    this.anims.create({
+      key: 'attackLeft',
+      frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: 1
   });
-
-  this.anims.create({
-    key: 'right',
-    frames: this.anims.generateFrameNumbers('dude', { start: 3, end: 5 }),
+    this.anims.create({
+      key: 'attackRight',
+      frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.anims.create({
+      key: 'SattackRight',
+      frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: 1
+    });
+    this.anims.create({
+    key: 'SattackLeft',
+    frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
     frameRate: 10,
     repeat: 1
+    });
+  } 
+  //ANIMATIONS MINAUTORE
+  else if (random >= 3 && random <= 5) {
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('minautore', { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: 1
+  });
+  
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('minautore', { start: 3, end: 5 }),
+      frameRate: 10,
+      repeat: 1
   });
   this.anims.create({
     key: 'attackLeft',
-    frames: this.anims.generateFrameNumbers('dudeAttack', { start: 0, end: 2 }),
+    frames: this.anims.generateFrameNumbers('minauAttack', { start: 0, end: 2 }),
     frameRate: 10,
     repeat: 1
   });
   this.anims.create({
     key: 'attackRight',
-    frames: this.anims.generateFrameNumbers('dudeAttack', { start: 3, end: 6 }),
+    frames: this.anims.generateFrameNumbers('minauAttack', { start: 3, end: 5 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  
+  this.anims.create({
+    key: 'SattackRight',
+    frames: this.anims.generateFrameNumbers('SminauAttack', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+  key: 'SattackLeft',
+  frames: this.anims.generateFrameNumbers('SminauAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+  });
+  }
+  //ANIMATIONS NAINS
+  else if (random > 5 && random < 8) {
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('nain', { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: 1
+  });
+  
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('nain', { start: 3, end: 6 }),
+      frameRate: 10,
+      repeat: 1
+  });
+  this.anims.create({
+    key: 'attackLeft',
+    frames: this.anims.generateFrameNumbers('nainAttack', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+    key: 'attackRight',
+    frames: this.anims.generateFrameNumbers('nainAttack', { start: 3, end: 6 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  
+  this.anims.create({
+    key: 'SattackRight',
+    frames: this.anims.generateFrameNumbers('SnainAttack', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+  key: 'SattackLeft',
+  frames: this.anims.generateFrameNumbers('SnainAttack', { start: 3, end: 6 }),
+  frameRate: 10,
+  repeat: 1
+  });
+  }
+    //ANIMATIONS PERE NOEL
+  else if (random >= 8 && random <= 10) {
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('noel', { start: 0, end: 2 }),
+      frameRate: 10,
+      repeat: 1
+  });
+  
+  this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('noel', { start: 3, end: 6 }),
+      frameRate: 10,
+      repeat: 1
+  });
+  
+  this.anims.create({
+    key: 'attackLeft',
+    frames: this.anims.generateFrameNumbers('noelAttack', { start: 0, end: 2 }),
+    frameRate: 10,
+    repeat: 1
+  });
+  this.anims.create({
+    key: 'attackRight',
+    frames: this.anims.generateFrameNumbers('noelAttack', { start: 3, end: 6 }),
     frameRate: 10,
     repeat: 1
   });
   this.anims.create({
     key: 'SattackRight',
-    frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 0, end: 2 }),
+    frames: this.anims.generateFrameNumbers('SnoelAttack', { start: 3, end: 6 }),
     frameRate: 10,
     repeat: 1
   });
   this.anims.create({
-    key: 'SattackLeft',
-    frames: this.anims.generateFrameNumbers('SdudeAttack', { start: 3, end: 6 }),
-    frameRate: 10,
-    repeat: 1
+  key: 'SattackLeft',
+  frames: this.anims.generateFrameNumbers('SnoelAttack', { start: 0, end: 2 }),
+  frameRate: 10,
+  repeat: 1
   });
+  }
+  
 
 
   this.socket.on('currentPlayers', function (players) {
@@ -219,11 +420,11 @@ function addPlayer(self, playerInfo) {
   // self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
   //   .setOrigin(0.5, 0.5).setDisplaySize(83, 80);
   if (playerInfo.team === 'blue') {
-    self.ship.setTint(0x0000ff);
+    self.ship.setTint(0x66cccc);
     teamBlue.push(playerInfo.playerId);
 
   } else {
-    self.ship.setTint(0xff0000);
+    self.ship.setTint(0xff9999);
     teamRed.push(playerInfo.playerId);
   }
   self.ship.setDrag(100);
@@ -231,12 +432,30 @@ function addPlayer(self, playerInfo) {
   self.ship.setMaxVelocity(70);
 }
 function addOtherPlayers(self, playerInfo) {
-  const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
+  //const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
+   // CREE BLUE
+   if (randomOP < 3) {
+    otherPlayer = self.physics.add.sprite(100, 350, 'dude')
+  }
+  // CREE UN MINAUTORE
+  else if(randomOP >= 3 && randomOP <= 5 ) {
+    otherPlayer = self.physics.add.sprite(100, 350, 'minautore')
+  }
+ // CREE UN NAIN
+  else if(randomOP > 5 && randomOP < 8 ) {
+    otherPlayer = self.physics.add.sprite(100, 350, 'nain').setDisplaySize(90, 70)
+  }
+
+  //CREE PERE NOEL
+  else if(randomOP >=8 && randomOP <=10) {
+    otherPlayer = self.physics.add.sprite(100, 350, 'noel').setDisplaySize(80, 65)
+  }
   if (playerInfo.team === 'blue') {
-    otherPlayer.setTint(0x0000ff);
+    otherPlayer.setTint(0x66cccc);
     teamBlue.push(playerInfo.playerId);
+
   } else {
-    otherPlayer.setTint(0xff0000);
+    otherPlayer.setTint(0xff9999);
     teamRed.push(playerInfo.playerId);
   }
   otherPlayer.playerId = playerInfo.playerId;
