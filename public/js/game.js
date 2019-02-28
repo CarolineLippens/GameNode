@@ -20,6 +20,7 @@ var config = {
 var game = new Phaser.Game(config);
 let direction = 0, player, otherPlayer;
 let teamBlue = [], teamRed = [];
+let MainPlayerTeam, OtherPlayerTeam;
 function preload() {
 
   this.load.spritesheet('dude', 'assets/bluerun.png', { frameWidth: 75, frameHeight: 80 });
@@ -43,6 +44,8 @@ function update() {
       direction = "left";
       this.ship.setVelocityX(-100);
       this.ship.anims.play('left', true);
+      console.log(this.ship);
+      this.physics.add.collider(this.ship, this.otherPlayers);
 
     } else if (this.cursors.right.isDown) {
       direction = "right";
@@ -62,15 +65,18 @@ function update() {
       direction = "left";
       this.ship.setVelocityY(-100);
       this.ship.anims.play('left', true);
+
     } else if (direction == "left" && this.cursors.down.isDown) {
       direction = "left";
       this.ship.setVelocityY(100);
       this.ship.anims.play('left', true);
+
     }//les Attaques
     if (direction == "left" && this.cursors.space.isDown) {
+      
       direction = "left";
       this.ship.anims.play('attackLeft', true);
-
+      // console.log(this.otherPlayers.children.entries[0].playerId);
       this.physics.add.collider(this.ship, this.otherPlayers, degat,null,this);
 
     } else if (direction == "right" && this.cursors.space.isDown) {
@@ -94,12 +100,14 @@ function update() {
         this.socket.emit('attaque');
       });
     }
+
     // emit player movement
     var x = this.ship.x;
     var y = this.ship.y;
     var r = this.ship.rotation;
+    var team = this.ship.team;
     if (this.ship.oldPosition && (x !== this.ship.oldPosition.x || y !== this.ship.oldPosition.y || r !== this.ship.oldPosition.rotation)) {
-      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation });
+      this.socket.emit('playerMovement', { x: this.ship.x, y: this.ship.y, rotation: this.ship.rotation});
     }
     
 
@@ -182,12 +190,14 @@ function create() {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         addPlayer(self, players[id]);
-
+        MainPlayerTeam= players[id].team;
       } else {
         addOtherPlayers(self, players[id]);
+        OtherPlayerTeam= players[id].team;
       }
     });
   });
+  console.log(MainPlayerTeam, OtherPlayerTeam);
 
   this.socket.on('newPlayer', function (playerInfo) {
     addOtherPlayers(self, playerInfo);
@@ -225,13 +235,13 @@ function create() {
       }
     });
   });
-  console.log(this.ship.team);
-  console.log(this.otherPlayers.playerId);
   
 }
 function addPlayer(self, playerInfo) {
   // self.ship = self.physics.add.image(playerInfo.x, playerInfo.y, 'dude')
   //   .setOrigin(0.5, 0.5).setDisplaySize(83, 80);
+  MainPlayerTeam = playerInfo.team;
+  console.log(playerInfo.team);
   if (playerInfo.team === 'blue') {
     self.ship.setTint(0x0000ff);
     teamBlue.push(playerInfo.playerId);
@@ -248,10 +258,10 @@ function addOtherPlayers(self, playerInfo) {
   const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'otherPlayer').setOrigin(0.5, 0.5).setDisplaySize(83, 80);
   if (playerInfo.team === 'blue') {
     otherPlayer.setTint(0x0000ff);
-    teamBlue.push(playerInfo.playerId);
+    
   } else {
     otherPlayer.setTint(0xff0000);
-    teamRed.push(playerInfo.playerId);
+    
   }
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
